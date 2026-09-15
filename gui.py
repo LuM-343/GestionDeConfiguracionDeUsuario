@@ -513,7 +513,9 @@ class VentanaPrincipal(tk.Tk):
 
         self.lbl_avatar_header = tk.Label(self.bloque_avatar, text="[ FOTO ]", font=FUENTE_NEGRITA)
         self.lbl_avatar_header.pack(pady=(0, 6))
-        self.lbl_avatar_img = tk.Label(self.bloque_avatar, relief=tk.SOLID, bd=3, width=14, height=6)
+        
+        # Dejar sin width/height fijos para que no encoja la imagen cargada
+        self.lbl_avatar_img = tk.Label(self.bloque_avatar, relief=tk.SOLID, bd=3)
         self.lbl_avatar_img.pack()
 
     def aplicar_cambios_visuales(self):
@@ -632,7 +634,7 @@ class VentanaPrincipal(tk.Tk):
             except Exception:
                 pass
         self.imagen_avatar = None
-        self.lbl_avatar_img.configure(image="", text="[ VACÍO ]", font=FUENTE_NEGRITA, bg=bg_panel)
+        self.lbl_avatar_img.configure(image="", text="[ VACÍO ]", width=14, height=8, font=FUENTE_NEGRITA, bg=bg_panel)
 
     def _abrir_settings(self):
         VentanaConfig(self, self.config, self._recibir_nueva_config)
