@@ -26,7 +26,7 @@ DICCIONARIO_IDIOMAS = {
         "menu_file": "[ARCHIVO]",
         "menu_edit": "[EDICION]",
         "menu_view": "[VER]",
-        "menu_settings": "CONFIGURACIÓN*",
+        "menu_settings": "CONFIGURACIÓN",
         "sim_new": "> NUEVO",
         "sim_open": "> ABRIR",
         "sim_exit": "> SALIR",
@@ -44,13 +44,33 @@ DICCIONARIO_IDIOMAS = {
         "saved_ok": "CONFIGURACIÓN PERSISTIDA CORRECTAMENTE (.BAK OK)",
         "saved_err": "ERROR CRÍTICO AL ESCRIBIR EN DISCO",
         "sim_msg": "SIMULACIÓN COORECTA DE: {opc}",
-        "btn_default": "[POR DEFECTO]"
+        "btn_default": "[POR DEFECTO]",
+        # Traducciones de la ventana de configuración
+        "cfg_win_title": "CONFIGURACIÓN DE INTERFAZ - PROYECTO 1",
+        "cfg_banner": "[ PANEL DE CONTROL :: EDICIÓN ]",
+        "cfg_lbl_user": "1. USUARIO [UTF-8]:",
+        "cfg_lbl_theme": "2. TEMA UI:",
+        "cfg_lbl_lang": "3. IDIOMA:",
+        "cfg_lbl_font": "4. TAMAÑO FUENTE:",
+        "cfg_lbl_menu_color": "5. COLOR BARRA:",
+        "cfg_lbl_text_color": "6. COLOR TEXTO:",
+        "cfg_lbl_photo": "7. FOTO PERFIL:",
+        "cfg_btn_color": "ELEGIR COLOR",
+        "cfg_btn_browse": "EXPLORAR...",
+        "cfg_not_assigned": "NO ASIGNADA",
+        "cfg_btn_cancel": "CANCELAR [X]",
+        "cfg_btn_save": "GUARDAR [✔]",
+        "cfg_err_font_title": "ERROR DE TIPO",
+        "cfg_err_font_msg": "EL TAMAÑO DE FUENTE DEBE SER UN ENTERO.",
+        "dlg_color_menu": "SELECCIONAR COLOR DE BARRA",
+        "dlg_color_text": "SELECCIONAR COLOR DE LETRA",
+        "dlg_photo": "SELECCIONAR FOTO DE PERFIL"
     },
     "en": {
         "menu_file": "[FILE]",
         "menu_edit": "[EDIT]",
         "menu_view": "[VIEW]",
-        "menu_settings": "SETTINGS*",
+        "menu_settings": "SETTINGS",
         "sim_new": "> NEW",
         "sim_open": "> OPEN",
         "sim_exit": "> EXIT",
@@ -68,7 +88,27 @@ DICCIONARIO_IDIOMAS = {
         "saved_ok": "CONFIG PERSISTED SUCCESSFULLY (.BAK OK)",
         "saved_err": "CRITICAL ERROR SAVING CONFIGURATION",
         "sim_msg": "SUCCESS SIMULATION OF: {opc}",
-        "btn_default": "[RESET / DEFAULTS]"
+        "btn_default": "[RESET / DEFAULTS]",
+        # Traducciones de la ventana de configuración
+        "cfg_win_title": "INTERFACE SETTINGS - PROJECT 1",
+        "cfg_banner": "[ CONTROL PANEL :: EDITING ]",
+        "cfg_lbl_user": "1. USER [UTF-8]:",
+        "cfg_lbl_theme": "2. UI THEME:",
+        "cfg_lbl_lang": "3. LANGUAGE:",
+        "cfg_lbl_font": "4. FONT SIZE:",
+        "cfg_lbl_menu_color": "5. BAR COLOR:",
+        "cfg_lbl_text_color": "6. TEXT COLOR:",
+        "cfg_lbl_photo": "7. PROFILE PIC:",
+        "cfg_btn_color": "CHOOSE COLOR",
+        "cfg_btn_browse": "BROWSE...",
+        "cfg_not_assigned": "NOT ASSIGNED",
+        "cfg_btn_cancel": "CANCEL [X]",
+        "cfg_btn_save": "SAVE [✔]",
+        "cfg_err_font_title": "TYPE ERROR",
+        "cfg_err_font_msg": "FONT SIZE MUST BE AN INTEGER.",
+        "dlg_color_menu": "SELECT BAR COLOR",
+        "dlg_color_text": "SELECT TEXT COLOR",
+        "dlg_photo": "SELECT PROFILE PICTURE"
     }
 }
 
@@ -89,7 +129,11 @@ class VentanaConfig(tk.Toplevel):
         self.config_actual = config_actual
         self.callback_guardado = callback_guardado
 
-        self.title("CONFIGURACIÓN DE INTERFAZ - PROYECTO 1")
+        # Idioma activo de la configuración (no cambia visualmente hasta guardar)
+        self.idioma_activo = self.config_actual.get("idioma", "es")
+        self.t = obtener_textos(self.idioma_activo)
+
+        self.title(self.t["cfg_win_title"])
         self.geometry("500x560")
         self.resizable(False, False)
         self.configure(bg=AMARILLO_CHILLANTE)
@@ -99,7 +143,7 @@ class VentanaConfig(tk.Toplevel):
         # Variables vinculadas a campos requeridos
         self.var_usuario = tk.StringVar(value=self.config_actual.get("nombre_usuario", "Usuario"))
         self.var_tema = tk.StringVar(value=self.config_actual.get("tema_interfaz", "claro"))
-        self.var_idioma = tk.StringVar(value=self.config_actual.get("idioma", "es"))
+        self.var_idioma = tk.StringVar(value=self.idioma_activo)
         self.var_fuente = tk.IntVar(value=self.config_actual.get("tamano_fuente", 10))
         self.var_color_menu = tk.StringVar(value=self.config_actual.get("color_barra_menu", "#000000"))
         self.var_color_letra = tk.StringVar(value=self.config_actual.get("color_letra", "#000000"))
@@ -111,7 +155,7 @@ class VentanaConfig(tk.Toplevel):
         # Cabecera 
         lbl_banner = tk.Label(
             self,
-            text="[ PANEL DE CONTROL :: EDICIÓN ]",
+            text=self.t["cfg_banner"],
             bg=CONTORNOS,
             fg="#FFFFFF",
             font=FUENTE_TITULO,
@@ -123,13 +167,13 @@ class VentanaConfig(tk.Toplevel):
         contenedor.pack(fill=tk.BOTH, expand=True, padx=16, pady=16)
 
         filas = [
-            ("1. USUARIO [UTF-8]:", self._widget_usuario),
-            ("2. TEMA UI:", self._widget_tema),
-            ("3. IDIOMA:", self._widget_idioma),
-            ("4. TAMAÑO FUENTE:", self._widget_fuente),
-            ("5. COLOR BARRA:", self._widget_color_menu),
-            ("6. COLOR TEXTO:", self._widget_color_letra),
-            ("7. FOTO PERFIL:", self._widget_foto)
+            (self.t["cfg_lbl_user"], self._widget_usuario),
+            (self.t["cfg_lbl_theme"], self._widget_tema),
+            (self.t["cfg_lbl_lang"], self._widget_idioma),
+            (self.t["cfg_lbl_font"], self._widget_fuente),
+            (self.t["cfg_lbl_menu_color"], self._widget_color_menu),
+            (self.t["cfg_lbl_text_color"], self._widget_color_letra),
+            (self.t["cfg_lbl_photo"], self._widget_foto)
         ]
 
         for idx, (etiqueta, fn_creador) in enumerate(filas):
@@ -151,10 +195,9 @@ class VentanaConfig(tk.Toplevel):
         f_bot.pack(side=tk.BOTTOM, fill=tk.X, padx=14, pady=10)
 
         # Botón para restablecer valores por defecto
-        t = obtener_textos(self.var_idioma.get())
         self.btn_default = tk.Button(
             f_bot,
-            text=t["btn_default"],
+            text=self.t["btn_default"],
             font=FUENTE_NEGRITA,
             bg=GRIS_RESET,
             fg=CONTORNOS,
@@ -169,7 +212,7 @@ class VentanaConfig(tk.Toplevel):
 
         btn_cancelar = tk.Button(
             f_bot,
-            text="CANCELAR [X]",
+            text=self.t["cfg_btn_cancel"],
             font=FUENTE_NEGRITA,
             bg=ROJAZO,
             fg="#FFFFFF",
@@ -184,7 +227,7 @@ class VentanaConfig(tk.Toplevel):
 
         btn_guardar = tk.Button(
             f_bot,
-            text="GUARDAR [✔]",
+            text=self.t["cfg_btn_save"],
             font=FUENTE_NEGRITA,
             bg=BOTONES,
             fg=CONTORNOS,
@@ -233,6 +276,7 @@ class VentanaConfig(tk.Toplevel):
     def _widget_idioma(self, parent, r):
         f = tk.Frame(parent, bg=FONDO)
         f.grid(row=r, column=1, sticky="w", padx=12, pady=6)
+        # Sin comando reactivo: el cambio de idioma se procesará al pulsar guardar
         for i in ["es", "en"]:
             tk.Radiobutton(
                 f,
@@ -243,13 +287,8 @@ class VentanaConfig(tk.Toplevel):
                 fg=CONTORNOS,
                 font=FUENTE_CUERPO,
                 activebackground=FONDO,
-                selectcolor="#FFFFFF",
-                command=self._actualizar_etiqueta_boton_default
+                selectcolor="#FFFFFF"
             ).pack(side=tk.LEFT, padx=4)
-
-    def _actualizar_etiqueta_boton_default(self):
-        t = obtener_textos(self.var_idioma.get())
-        self.btn_default.configure(text=t["btn_default"])
 
     def _widget_fuente(self, parent, r):
         spin = tk.Spinbox(
@@ -270,7 +309,7 @@ class VentanaConfig(tk.Toplevel):
         self.prev_menu = tk.Label(f, width=4, relief=tk.SOLID, bd=2, bg=self.var_color_menu.get())
         self.prev_menu.pack(side=tk.LEFT, padx=(0, 6))
         tk.Button(
-            f, text="ELEGIR COLOR", font=FUENTE_CUERPO, relief=tk.SOLID, bd=2,
+            f, text=self.t["cfg_btn_color"], font=FUENTE_CUERPO, relief=tk.SOLID, bd=2,
             bg=FONDO, cursor="hand2", command=self._seleccionar_color_menu
         ).pack(side=tk.LEFT)
 
@@ -280,7 +319,7 @@ class VentanaConfig(tk.Toplevel):
         self.prev_letra = tk.Label(f, width=4, relief=tk.SOLID, bd=2, bg=self.var_color_letra.get())
         self.prev_letra.pack(side=tk.LEFT, padx=(0, 6))
         tk.Button(
-            f, text="ELEGIR COLOR", font=FUENTE_CUERPO, relief=tk.SOLID, bd=2,
+            f, text=self.t["cfg_btn_color"], font=FUENTE_CUERPO, relief=tk.SOLID, bd=2,
             bg=FONDO, cursor="hand2", command=self._seleccionar_color_letra
         ).pack(side=tk.LEFT)
 
@@ -289,7 +328,7 @@ class VentanaConfig(tk.Toplevel):
         f.grid(row=r, column=1, sticky="ew", padx=12, pady=6)
         self.lbl_foto = tk.Label(
             f,
-            text=os.path.basename(self.var_foto.get()) or "NO ASIGNADA",
+            text=os.path.basename(self.var_foto.get()) or self.t["cfg_not_assigned"],
             font=("Courier New", 9),
             bg="#EFEFEF",
             relief=tk.SOLID,
@@ -299,25 +338,25 @@ class VentanaConfig(tk.Toplevel):
         )
         self.lbl_foto.pack(side=tk.LEFT, padx=(0, 6))
         tk.Button(
-            f, text="EXPLORAR...", font=FUENTE_CUERPO, relief=tk.SOLID, bd=2,
+            f, text=self.t["cfg_btn_browse"], font=FUENTE_CUERPO, relief=tk.SOLID, bd=2,
             bg=FONDO, cursor="hand2", command=self._seleccionar_foto
         ).pack(side=tk.LEFT)
 
     def _seleccionar_color_menu(self):
-        c = colorchooser.askcolor(self.var_color_menu.get(), title="SELECCIONAR COLOR DE BARRA")
+        c = colorchooser.askcolor(self.var_color_menu.get(), title=self.t["dlg_color_menu"])
         if c[1]:
             self.var_color_menu.set(c[1])
             self.prev_menu.configure(bg=c[1])
 
     def _seleccionar_color_letra(self):
-        c = colorchooser.askcolor(self.var_color_letra.get(), title="SELECCIONAR COLOR DE LETRA")
+        c = colorchooser.askcolor(self.var_color_letra.get(), title=self.t["dlg_color_text"])
         if c[1]:
             self.var_color_letra.set(c[1])
             self.prev_letra.configure(bg=c[1])
 
     def _seleccionar_foto(self):
         r = filedialog.askopenfilename(
-            title="SELECCIONAR FOTO DE PERFIL",
+            title=self.t["dlg_photo"],
             filetypes=[("Imágenes", "*.png *.jpg *.jpeg *.bmp *.gif"), ("Todos", "*.*")]
         )
         if r:
@@ -345,14 +384,13 @@ class VentanaConfig(tk.Toplevel):
 
         self.prev_menu.configure(bg=self.var_color_menu.get())
         self.prev_letra.configure(bg=self.var_color_letra.get())
-        self.lbl_foto.configure(text=os.path.basename(self.var_foto.get()) or "NO ASIGNADA")
-        self._actualizar_etiqueta_boton_default()
+        self.lbl_foto.configure(text=os.path.basename(self.var_foto.get()) or self.t["cfg_not_assigned"])
 
     def _guardar(self):
         try:
             fuente_val = int(self.var_fuente.get())
         except ValueError:
-            messagebox.showerror("ERROR DE TIPO", "EL TAMAÑO DE FUENTE DEBE SER UN ENTERO.")
+            messagebox.showerror(self.t["cfg_err_font_title"], self.t["cfg_err_font_msg"])
             return
 
         nueva_cfg = {
@@ -367,13 +405,12 @@ class VentanaConfig(tk.Toplevel):
 
         # Guardado con validaciones en configManager
         if cm.escribirConfiguracion(nueva_cfg):
-            t = obtener_textos(nueva_cfg["idioma"])
-            messagebox.showinfo("ESTADO DE PERSISTENCIA", t["saved_ok"])
+            t_nuevo = obtener_textos(nueva_cfg["idioma"])
+            messagebox.showinfo("ESTADO DE PERSISTENCIA", t_nuevo["saved_ok"])
             self.callback_guardado(nueva_cfg)
             self.destroy()
         else:
-            t = obtener_textos(self.var_idioma.get())
-            messagebox.showerror("ERROR DE ARCHIVO", t["saved_err"])
+            messagebox.showerror("ERROR DE ARCHIVO", self.t["saved_err"])
 
 
 # ==============================================================================
@@ -422,7 +459,19 @@ class VentanaPrincipal(tk.Tk):
         )
         self.btn_settings.pack(side=tk.RIGHT, padx=4, pady=3)
 
-        # 2. Contenedor central principal
+        # 2. Barra de estado inferior maciza
+        self.status_bar = tk.Label(
+            self,
+            relief=tk.SOLID,
+            bd=2,
+            font=("Courier New", 9, "bold"),
+            anchor="w",
+            padx=8,
+            pady=3
+        )
+        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+
+        # 3. Contenedor central principal
         self.marco_central = tk.Frame(self, relief=tk.SOLID, bd=4)
         self.marco_central.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
 
@@ -464,20 +513,8 @@ class VentanaPrincipal(tk.Tk):
 
         self.lbl_avatar_header = tk.Label(self.bloque_avatar, text="[ FOTO ]", font=FUENTE_NEGRITA)
         self.lbl_avatar_header.pack(pady=(0, 6))
-        self.lbl_avatar_img = tk.Label(self.bloque_avatar, relief=tk.SOLID, bd=3, width=110, height=110)
+        self.lbl_avatar_img = tk.Label(self.bloque_avatar, relief=tk.SOLID, bd=3, width=14, height=6)
         self.lbl_avatar_img.pack()
-
-        # 3. Barra de estado inferior maciza
-        self.status_bar = tk.Label(
-            self,
-            relief=tk.SOLID,
-            bd=2,
-            font=("Courier New", 9, "bold"),
-            anchor="w",
-            padx=8,
-            pady=3
-        )
-        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 
     def aplicar_cambios_visuales(self):
         t = obtener_textos(self.config.get("idioma", "es"))
@@ -527,7 +564,7 @@ class VentanaPrincipal(tk.Tk):
         self.mb_ver.configure(text=t["menu_view"])
 
         self.btn_settings.configure(
-            text=f"⚡ {t['menu_settings']}",
+            text=f"⚙️ {t['menu_settings']}",
             bg=accent_btn,
             fg=CONTORNOS,
             font=FUENTE_NEGRITA
