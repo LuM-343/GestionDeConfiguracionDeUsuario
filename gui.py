@@ -45,7 +45,7 @@ DICCIONARIO_IDIOMAS = {
         "saved_err": "ERROR CRÍTICO AL ESCRIBIR EN DISCO",
         "sim_msg": "SIMULACIÓN COORECTA DE: {opc}",
         "btn_default": "[POR DEFECTO]",
-        # Traducciones de la ventana de configuración
+        # Textos de la ventana de configuración
         "cfg_win_title": "CONFIGURACIÓN DE INTERFAZ - PROYECTO 1",
         "cfg_banner": "[ PANEL DE CONTROL :: EDICIÓN ]",
         "cfg_lbl_user": "1. USUARIO [UTF-8]:",
@@ -89,7 +89,7 @@ DICCIONARIO_IDIOMAS = {
         "saved_err": "CRITICAL ERROR SAVING CONFIGURATION",
         "sim_msg": "SUCCESS SIMULATION OF: {opc}",
         "btn_default": "[RESET / DEFAULTS]",
-        # Traducciones de la ventana de configuración
+        # Textos de la ventana de configuración
         "cfg_win_title": "INTERFACE SETTINGS - PROJECT 1",
         "cfg_banner": "[ CONTROL PANEL :: EDITING ]",
         "cfg_lbl_user": "1. USER [UTF-8]:",
@@ -129,20 +129,36 @@ class VentanaConfig(tk.Toplevel):
         self.config_actual = config_actual
         self.callback_guardado = callback_guardado
 
-        # Idioma activo de la configuración (no cambia visualmente hasta guardar)
         self.idioma_activo = self.config_actual.get("idioma", "es")
+        self.tema_activo = self.config_actual.get("tema_interfaz", "claro")
         self.t = obtener_textos(self.idioma_activo)
+
+        # Paleta dinámica de la ventana de configuración según el tema
+        if self.tema_activo == "oscuro":
+            self.c_bg_base = "#121212"
+            self.c_bg_panel = "#1E1E1E"
+            self.c_fg = "#FFFFFF"
+            self.c_borde = AMARILLO_CHILLANTE
+            self.c_entry_bg = "#2A2A2A"
+            self.c_btn_bg = "#2A2A2A"
+        else:
+            self.c_bg_base = AMARILLO_CHILLANTE
+            self.c_bg_panel = FONDO
+            self.c_fg = CONTORNOS
+            self.c_borde = CONTORNOS
+            self.c_entry_bg = "#FFFFFF"
+            self.c_btn_bg = FONDO
 
         self.title(self.t["cfg_win_title"])
         self.geometry("500x560")
         self.resizable(False, False)
-        self.configure(bg=AMARILLO_CHILLANTE)
+        self.configure(bg=self.c_bg_base)
         self.transient(parent)
         self.grab_set()
 
         # Variables vinculadas a campos requeridos
         self.var_usuario = tk.StringVar(value=self.config_actual.get("nombre_usuario", "Usuario"))
-        self.var_tema = tk.StringVar(value=self.config_actual.get("tema_interfaz", "claro"))
+        self.var_tema = tk.StringVar(value=self.tema_activo)
         self.var_idioma = tk.StringVar(value=self.idioma_activo)
         self.var_fuente = tk.IntVar(value=self.config_actual.get("tamano_fuente", 10))
         self.var_color_menu = tk.StringVar(value=self.config_actual.get("color_barra_menu", "#000000"))
@@ -152,7 +168,6 @@ class VentanaConfig(tk.Toplevel):
         self._construir_ui()
 
     def _construir_ui(self):
-        # Cabecera 
         lbl_banner = tk.Label(
             self,
             text=self.t["cfg_banner"],
@@ -163,7 +178,7 @@ class VentanaConfig(tk.Toplevel):
         )
         lbl_banner.pack(fill=tk.X)
 
-        contenedor = tk.Frame(self, bg=FONDO, highlightthickness=3, highlightbackground=CONTORNOS)
+        contenedor = tk.Frame(self, bg=self.c_bg_panel, highlightthickness=3, highlightbackground=self.c_borde)
         contenedor.pack(fill=tk.BOTH, expand=True, padx=16, pady=16)
 
         filas = [
@@ -180,8 +195,8 @@ class VentanaConfig(tk.Toplevel):
             lbl = tk.Label(
                 contenedor,
                 text=etiqueta,
-                bg=FONDO,
-                fg=CONTORNOS,
+                bg=self.c_bg_panel,
+                fg=self.c_fg,
                 font=FUENTE_CUERPO,
                 anchor="w"
             )
@@ -190,11 +205,9 @@ class VentanaConfig(tk.Toplevel):
 
         contenedor.columnconfigure(1, weight=1)
 
-        # Botones inferiores 
-        f_bot = tk.Frame(self, bg=AMARILLO_CHILLANTE)
+        f_bot = tk.Frame(self, bg=self.c_bg_base)
         f_bot.pack(side=tk.BOTTOM, fill=tk.X, padx=14, pady=10)
 
-        # Botón para restablecer valores por defecto
         self.btn_default = tk.Button(
             f_bot,
             text=self.t["btn_default"],
@@ -241,7 +254,6 @@ class VentanaConfig(tk.Toplevel):
         btn_guardar.pack(side=tk.RIGHT, padx=4)
 
     def _validar_tamano_usuario(self, nuevo_texto):
-        # Límite estricto de 30 caracteres
         return len(nuevo_texto) <= 30
 
     def _widget_usuario(self, parent, r):
@@ -252,14 +264,16 @@ class VentanaConfig(tk.Toplevel):
             font=FUENTE_CUERPO,
             relief=tk.SOLID,
             bd=2,
-            bg="#FFFFFF",
+            bg=self.c_entry_bg,
+            fg=self.c_fg,
+            insertbackground=self.c_fg,
             validate="key",
             validatecommand=vcmd
         )
         entry.grid(row=r, column=1, sticky="ew", padx=12, pady=6)
 
     def _widget_tema(self, parent, r):
-        f = tk.Frame(parent, bg=FONDO)
+        f = tk.Frame(parent, bg=self.c_bg_panel)
         f.grid(row=r, column=1, sticky="w", padx=12, pady=6)
         for t in ["claro", "oscuro"]:
             tk.Radiobutton(
@@ -267,27 +281,29 @@ class VentanaConfig(tk.Toplevel):
                 text=t.upper(),
                 value=t,
                 variable=self.var_tema,
-                bg=FONDO,
-                fg=CONTORNOS,
+                bg=self.c_bg_panel,
+                fg=self.c_fg,
+                selectcolor=self.c_entry_bg,
                 font=FUENTE_CUERPO,
-                activebackground=FONDO
+                activebackground=self.c_bg_panel,
+                activeforeground=self.c_fg
             ).pack(side=tk.LEFT, padx=4)
 
     def _widget_idioma(self, parent, r):
-        f = tk.Frame(parent, bg=FONDO)
+        f = tk.Frame(parent, bg=self.c_bg_panel)
         f.grid(row=r, column=1, sticky="w", padx=12, pady=6)
-        # Sin comando reactivo: el cambio de idioma se procesará al pulsar guardar
         for i in ["es", "en"]:
             tk.Radiobutton(
                 f,
                 text=i.upper(),
                 value=i,
                 variable=self.var_idioma,
-                bg=FONDO,
-                fg=CONTORNOS,
+                bg=self.c_bg_panel,
+                fg=self.c_fg,
+                selectcolor=self.c_entry_bg,
                 font=FUENTE_CUERPO,
-                activebackground=FONDO,
-                selectcolor="#FFFFFF"
+                activebackground=self.c_bg_panel,
+                activeforeground=self.c_fg
             ).pack(side=tk.LEFT, padx=4)
 
     def _widget_fuente(self, parent, r):
@@ -299,38 +315,42 @@ class VentanaConfig(tk.Toplevel):
             font=FUENTE_CUERPO,
             relief=tk.SOLID,
             bd=2,
-            width=6
+            width=6,
+            bg=self.c_entry_bg,
+            fg=self.c_fg,
+            buttonbackground=self.c_btn_bg
         )
         spin.grid(row=r, column=1, sticky="w", padx=12, pady=6)
 
     def _widget_color_menu(self, parent, r):
-        f = tk.Frame(parent, bg=FONDO)
+        f = tk.Frame(parent, bg=self.c_bg_panel)
         f.grid(row=r, column=1, sticky="w", padx=12, pady=6)
         self.prev_menu = tk.Label(f, width=4, relief=tk.SOLID, bd=2, bg=self.var_color_menu.get())
         self.prev_menu.pack(side=tk.LEFT, padx=(0, 6))
         tk.Button(
             f, text=self.t["cfg_btn_color"], font=FUENTE_CUERPO, relief=tk.SOLID, bd=2,
-            bg=FONDO, cursor="hand2", command=self._seleccionar_color_menu
+            bg=self.c_btn_bg, fg=self.c_fg, cursor="hand2", command=self._seleccionar_color_menu
         ).pack(side=tk.LEFT)
 
     def _widget_color_letra(self, parent, r):
-        f = tk.Frame(parent, bg=FONDO)
+        f = tk.Frame(parent, bg=self.c_bg_panel)
         f.grid(row=r, column=1, sticky="w", padx=12, pady=6)
         self.prev_letra = tk.Label(f, width=4, relief=tk.SOLID, bd=2, bg=self.var_color_letra.get())
         self.prev_letra.pack(side=tk.LEFT, padx=(0, 6))
         tk.Button(
             f, text=self.t["cfg_btn_color"], font=FUENTE_CUERPO, relief=tk.SOLID, bd=2,
-            bg=FONDO, cursor="hand2", command=self._seleccionar_color_letra
+            bg=self.c_btn_bg, fg=self.c_fg, cursor="hand2", command=self._seleccionar_color_letra
         ).pack(side=tk.LEFT)
 
     def _widget_foto(self, parent, r):
-        f = tk.Frame(parent, bg=FONDO)
+        f = tk.Frame(parent, bg=self.c_bg_panel)
         f.grid(row=r, column=1, sticky="ew", padx=12, pady=6)
         self.lbl_foto = tk.Label(
             f,
             text=os.path.basename(self.var_foto.get()) or self.t["cfg_not_assigned"],
             font=("Courier New", 9),
-            bg="#EFEFEF",
+            bg=self.c_entry_bg,
+            fg=self.c_fg,
             relief=tk.SOLID,
             bd=1,
             width=14,
@@ -339,7 +359,7 @@ class VentanaConfig(tk.Toplevel):
         self.lbl_foto.pack(side=tk.LEFT, padx=(0, 6))
         tk.Button(
             f, text=self.t["cfg_btn_browse"], font=FUENTE_CUERPO, relief=tk.SOLID, bd=2,
-            bg=FONDO, cursor="hand2", command=self._seleccionar_foto
+            bg=self.c_btn_bg, fg=self.c_fg, cursor="hand2", command=self._seleccionar_foto
         ).pack(side=tk.LEFT)
 
     def _seleccionar_color_menu(self):
@@ -403,7 +423,6 @@ class VentanaConfig(tk.Toplevel):
             "foto_perfil": self.var_foto.get()
         }
 
-        # Guardado con validaciones en configManager
         if cm.escribirConfiguracion(nueva_cfg):
             t_nuevo = obtener_textos(nueva_cfg["idioma"])
             messagebox.showinfo("ESTADO DE PERSISTENCIA", t_nuevo["saved_ok"])
@@ -430,7 +449,7 @@ class VentanaPrincipal(tk.Tk):
         self.aplicar_cambios_visuales()
 
     def _crear_estructura(self):
-        # 1. Barra de menús modular 
+        # 1. Barra de menús modular
         self.frame_menu = tk.Frame(self, relief=tk.SOLID, bd=3)
         self.frame_menu.pack(side=tk.TOP, fill=tk.X)
 
@@ -449,7 +468,6 @@ class VentanaPrincipal(tk.Tk):
         self.mb_ver.configure(menu=self.m_ver)
         self.mb_ver.pack(side=tk.LEFT, padx=3, pady=3)
 
-        # Botón Settings destacado 
         self.btn_settings = tk.Button(
             self.frame_menu,
             relief=tk.SOLID,
@@ -459,7 +477,7 @@ class VentanaPrincipal(tk.Tk):
         )
         self.btn_settings.pack(side=tk.RIGHT, padx=4, pady=3)
 
-        # 2. Barra de estado inferior maciza
+        # 2. Barra de estado inferior (empaquetada antes para reservar su lugar)
         self.status_bar = tk.Label(
             self,
             relief=tk.SOLID,
@@ -513,8 +531,6 @@ class VentanaPrincipal(tk.Tk):
 
         self.lbl_avatar_header = tk.Label(self.bloque_avatar, text="[ FOTO ]", font=FUENTE_NEGRITA)
         self.lbl_avatar_header.pack(pady=(0, 6))
-        
-        # Dejar sin width/height fijos para que no encoja la imagen cargada
         self.lbl_avatar_img = tk.Label(self.bloque_avatar, relief=tk.SOLID, bd=3)
         self.lbl_avatar_img.pack()
 
@@ -527,7 +543,6 @@ class VentanaPrincipal(tk.Tk):
         tema = self.config.get("tema_interfaz", "claro")
         foto_ruta = self.config.get("foto_perfil", "")
 
-        # Configuración visual de paleta según tema claro u oscuro
         if tema == "oscuro":
             bg_base = "#121212"
             bg_panel = "#1E1E1E"
@@ -548,7 +563,6 @@ class VentanaPrincipal(tk.Tk):
         f_dinamica = ("Courier New", tamano_f, "bold")
         f_dinamica_lg = ("Courier New", tamano_f + 2, "bold")
 
-        # Fondos
         self.configure(bg=bg_base)
         self.marco_central.configure(bg=bg_panel)
         self.cuerpo.configure(bg=bg_panel)
@@ -556,7 +570,6 @@ class VentanaPrincipal(tk.Tk):
         self.bloque_avatar.configure(bg=bg_panel)
         self.lbl_avatar_header.configure(bg=bg_panel, fg=fg_general)
 
-        # Barra de menús
         self.frame_menu.configure(bg=color_menu, highlightthickness=2, highlightbackground=borde_barra)
         for mb in (self.mb_archivo, self.mb_edicion, self.mb_ver):
             mb.configure(bg=menu_btn_bg, fg=menu_btn_fg, font=FUENTE_NEGRITA)
@@ -566,13 +579,12 @@ class VentanaPrincipal(tk.Tk):
         self.mb_ver.configure(text=t["menu_view"])
 
         self.btn_settings.configure(
-            text=f"⚙️ {t['menu_settings']}",
+            text=f"⚡ {t['menu_settings']}",
             bg=accent_btn,
             fg=CONTORNOS,
             font=FUENTE_NEGRITA
         )
 
-        # Submenús simulados
         for m in (self.m_archivo, self.m_edicion, self.m_ver):
             m.delete(0, tk.END)
 
@@ -588,10 +600,8 @@ class VentanaPrincipal(tk.Tk):
 
         self.m_ver.add_command(label=t["sim_statusbar"], command=lambda: self._simular(t["sim_statusbar"]))
 
-        # Título
         self.lbl_panel_titulo.configure(text=t["panel_title"])
 
-        # Datos
         self.lbl_usuario.configure(
             text=t["welcome"].format(usuario=self.config.get("nombre_usuario", "Usuario")),
             bg=bg_panel, fg=fg_general, font=f_dinamica_lg
@@ -613,10 +623,8 @@ class VentanaPrincipal(tk.Tk):
             bg=bg_panel, fg=fg_general, font=f_dinamica
         )
 
-        # Imagen
         self._actualizar_avatar(foto_ruta, bg_panel)
 
-        # Barra de estado
         self.status_bar.configure(
             text=f" PERSISTENCIA | UTF-8 | {tema.upper()} | {self.config.get('idioma', 'es').upper()} ",
             bg=accent_btn,
@@ -627,9 +635,9 @@ class VentanaPrincipal(tk.Tk):
         if ruta and os.path.exists(ruta):
             try:
                 img = Image.open(ruta)
-                img = img.resize((100, 100), Image.Resampling.LANCZOS)
+                img = img.resize((150, 150), Image.Resampling.LANCZOS)
                 self.imagen_avatar = ImageTk.PhotoImage(img)
-                self.lbl_avatar_img.configure(image=self.imagen_avatar, text="", bg=bg_panel)
+                self.lbl_avatar_img.configure(image=self.imagen_avatar, text="", width=150, height=150, bg=bg_panel)
                 return
             except Exception:
                 pass
