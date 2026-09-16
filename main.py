@@ -1,3 +1,8 @@
 # Siga atento
+# Sigan viendo  
+# Gracias por la espera y atención
+from gui import VentanaPrincipal
 
-#Sigan viendo
+if __name__ == "__main__":
+    app = VentanaPrincipal()
+    app.mainloop()

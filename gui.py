@@ -654,8 +654,3 @@ class VentanaPrincipal(tk.Tk):
     def _simular(self, accion):
         t = obtener_textos(self.config.get("idioma", "es"))
         messagebox.showinfo("MENU SIMULADO", t["sim_msg"].format(opc=accion))
-
-
-if __name__ == "__main__":
-    app = VentanaPrincipal()
-    app.mainloop()
