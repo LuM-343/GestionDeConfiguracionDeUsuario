@@ -397,7 +397,7 @@ class VentanaConfig(tk.Toplevel):
         self.var_usuario.set(defaults.get("nombre_usuario", "Usuario")[:30])
         self.var_tema.set(defaults.get("tema_interfaz", "claro"))
         self.var_idioma.set(defaults.get("idioma", "es"))
-        self.var_fuente.set(defaults.get("tamano_fuente", 10))
+        self.var_fuente.set(defaults.get("tamano_fuente", 12))
         self.var_color_menu.set(defaults.get("color_barra_menu", "#000000"))
         self.var_color_letra.set(defaults.get("color_letra", "#000000"))
         self.var_foto.set(defaults.get("foto_perfil", ""))
