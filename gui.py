@@ -310,7 +310,7 @@ class VentanaConfig(tk.Toplevel):
         spin = tk.Spinbox(
             parent,
             from_=8,
-            to=22,
+            to=30,
             textvariable=self.var_fuente,
             font=FUENTE_CUERPO,
             relief=tk.SOLID,
@@ -388,7 +388,7 @@ class VentanaConfig(tk.Toplevel):
             "nombre_usuario": "Usuario",
             "tema_interfaz": "claro",
             "idioma": "es",
-            "tamano_fuente": 10,
+            "tamano_fuente": 12,
             "color_barra_menu": "#000000",
             "color_letra": "#000000",
             "foto_perfil": ""
