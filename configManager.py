@@ -59,10 +59,10 @@ def validarRepararConfiguracion(datos):
             valida["tamano_fuente"] = tam
         else:
             print(f"[Validación] tamano_fuente fuera de rango ({tam}). Usando por defecto.")
-            valida["tamano_fuente"] = 10
+            valida["tamano_fuente"] = 12
     except (ValueError, TypeError):
         print("[Validación] tamano_fuente no es numérico. Usando por defecto.")
-        valida["tamano_fuente"] = 10
+        valida["tamano_fuente"] = 12
 
     # 5. Color de la barra de menú
     col_menu = datos.get("color_barra_menu")
@@ -123,9 +123,18 @@ def crearRespaldo():
 
 def escribirConfiguracion(configuracion=configuracionPorDefecto):
     try:
-        crearRespaldo()
+        if not crearRespaldo():
+            print("[Error] No se pudo crear el respaldo. Guardado cancelado.")
+            return False
+
         with open(TEMP_ARCHIVO, "w", encoding="utf-8") as temp:
-            json.dump(configuracion, temp, indent=4, ensure_ascii=False)
+            json.dump(
+                configuracion,
+                temp,
+                indent=4,
+                ensure_ascii=False
+            )
+
         os.replace(TEMP_ARCHIVO, CONFIG_ARCHIVO)
         return True
     except PermissionError:
